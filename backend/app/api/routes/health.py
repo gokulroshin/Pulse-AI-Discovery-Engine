@@ -15,6 +15,12 @@ router = APIRouter(tags=["Health & System"])
     summary="System Health Check",
     response_model=Dict[str, Any],
 )
+@router.get(
+    "/api/v1/health",
+    status_code=status.HTTP_200_OK,
+    summary="System Health Check (v1)",
+    response_model=Dict[str, Any],
+)
 def health_check(db: Session = Depends(get_db)) -> Dict[str, Any]:
     """Returns application health, database connectivity status, and system metadata."""
     db_status = "healthy"

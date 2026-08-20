@@ -24,6 +24,38 @@ async def lifespan(app: FastAPI):
     try:
         Base.metadata.create_all(bind=engine)
         logger.info("Database schema verification/initialization complete.")
+
+        # Check if database is empty and auto-bootstrap initial corpus and rankings
+        from app.db.session import SessionLocal
+        from app.models.document import RawDocument
+        from app.models.opportunity_score import OpportunityScore
+        
+        db = SessionLocal()
+        try:
+            doc_count = db.query(RawDocument.doc_id).count()
+            if doc_count == 0:
+                logger.info("Fresh database detected. Initializing multi-channel corpus and precomputing opportunity rankings...")
+                from scripts.seed_corpus import generate_curated_fashion_corpus
+                from app.ingestion.pipeline import pipeline
+                
+                curated_docs = generate_curated_fashion_corpus()
+                pipeline.ingest_batch(db, curated_docs, source_platform="curated_seed")
+                
+                from scripts.extract_multichannel import extract_from_channel_docs
+                extract_from_channel_docs("reddit", max_docs=400, session=db)
+                extract_from_channel_docs("appstore", max_docs=250, session=db)
+                extract_from_channel_docs("youtube", max_docs=100, session=db)
+                extract_from_channel_docs("playstore", max_docs=400, session=db)
+                
+                from app.aggregation.coordinator import AggregationCoordinator
+                coordinator = AggregationCoordinator()
+                coordinator.run(db=db)
+                logger.info("Corpus bootstrapping and opportunity scoring successfully completed.")
+        except Exception as bootstrap_err:
+            logger.warning(f"Bootstrap initialization note: {bootstrap_err}")
+        finally:
+            db.close()
+
     except Exception as e:
         logger.warning(f"Database auto-creation check note: {e}")
         

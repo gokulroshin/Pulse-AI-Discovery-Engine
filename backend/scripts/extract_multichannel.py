@@ -93,8 +93,14 @@ CAUSAL_PATTERNS = [
 ]
 
 
-def extract_from_channel_docs(platform: str, max_docs: int = 400):
-    db = SessionLocal()
+def extract_from_channel_docs(platform: str, max_docs: int = 400, session: Optional[Any] = None):
+    should_close = False
+    if session is not None:
+        db = session
+    else:
+        db = SessionLocal()
+        should_close = True
+
     try:
         # Check docs from this platform without extractions
         extracted_subquery = db.query(Extraction.doc_id).distinct().subquery()
@@ -161,7 +167,8 @@ def extract_from_channel_docs(platform: str, max_docs: int = 400):
         logger.info(f"Successfully extracted {extracted_count} reasons from {platform.upper()} documents.")
 
     finally:
-        db.close()
+        if should_close:
+            db.close()
 
 
 def main():
