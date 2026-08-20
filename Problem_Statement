@@ -1,0 +1,129 @@
+# Problem Statement: "Intently" — Wishlist-to-Purchase Discovery Engine
+## Myntra Growth Team — AI-Powered User Feedback Analysis System
+
+---
+
+## 1. Business Context
+
+Myntra's Growth Team has identified a strategic priority: **increase the percentage of users who purchase at least one item from their wishlist within 30 days of adding it.**
+
+Millions of users wishlist fashion products as a signal of explicit purchase interest, yet only a small fraction convert. Closing this gap represents a high-leverage growth opportunity because the demand already exists on-platform — the challenge is understanding *why* it stalls.
+
+**Constraint:** The eventual solution must NOT rely on monetary incentives (discounts, cashback, coupons, price drops). This system's job is discovery, not solutioning — but the discovery must be tight enough to point toward non-monetary levers (trust, information, fit confidence, styling guidance, urgency framing, social proof, UX friction removal, etc.).
+
+---
+
+## 2. Objective of This System
+
+Before any solution is proposed, build an **AI-powered qualitative discovery engine** that analyzes publicly available user feedback at scale to identify, quantify, and rank the *underlying behavioral and psychological reasons* wishlisted fashion items fail to convert to purchase.
+
+This is explicitly **not** a sentiment analysis or review-summarization tool. The system must go further — surfacing structured, comparable, prioritizable **opportunity areas** tied to the conversion metric.
+
+---
+
+## 3. Data Sources to Ingest
+
+The system should be able to pull from (via APIs, scrapers, or manual corpus upload where APIs are restricted):
+
+- App Store reviews (Myntra, AJIO, competitor fashion apps)
+- Play Store reviews
+- Reddit (r/IndianFashionAddicts, r/india, shopping/fashion-relevant subreddits)
+- Fashion and shopping community forums/blogs
+- Social media conversations (Twitter/X, Instagram comments where public)
+- YouTube comments (haul videos, review videos, unboxing, styling content)
+- Product reviews and Q&A sections (Myntra/AJIO/Amazon Fashion where public)
+- Any other publicly available conversations about online fashion shopping behavior
+
+---
+
+## 4. Core Research Questions the Engine Must Help Answer
+
+1. Why do users add fashion products to their wishlist in the first place?
+2. What specifically prevents a wishlisted product from eventually being purchased?
+3. What uncertainties remain *after* a user has already identified a product they like?
+4. What causes users to postpone or delay a purchase decision?
+5. How do users compare and evaluate multiple shortlisted/wishlisted products against each other?
+6. What information do users seek *outside* Myntra/AJIO before completing a purchase (reviews, sizing guides, influencer opinions, price history, etc.)?
+7. What role do the following play in the wishlist-to-purchase gap: fit/size confidence, styling/outfit context, price sensitivity, review credibility, occasion-relevance, and social validation?
+8. When is the wishlist used as genuine near-term purchase intent vs. a passive bookmarking/moodboard/"maybe someday" mechanism?
+9. How do these behaviors differ across user segments (e.g., gender, category — ethnic vs. western vs. footwear vs. accessories, price tier, first-time vs. repeat buyer, metro vs. non-metro)?
+10. What unmet needs recur consistently across independent sources and user groups (i.e., are triangulated, not single-source anecdotes)?
+
+---
+
+## 5. Required System Capabilities (Beyond Summarization)
+
+The engine must move through four analytical layers, not stop at the first:
+
+| Layer | Requirement |
+|---|---|
+| **1. Ingestion & Normalization** | Aggregate raw text from all sources above into a unified, de-duplicated corpus with source metadata (platform, date, product category if inferable, upvotes/engagement as a proxy for signal strength) |
+| **2. Thematic Extraction** | Use an LLM (Gemini) to extract discrete *reasons/behaviors/frictions* per post/comment — not generic sentiment (positive/negative) but specific causal statements (e.g., "unsure if the fit will match my body type," "waiting to see if a better price appears during sale season," "wanted a second opinion from friends before buying") |
+| **3. Clustering & Taxonomy Building** | Group extracted reasons into a coherent taxonomy of opportunity areas (e.g., Fit/Size Uncertainty, Styling Uncertainty, Trust/Review Credibility Gap, Deferred Decision-Making/Procrastination, Price-Timing Behavior, Social Validation Need, Occasion Mismatch, Bookmarking vs. Intent Ambiguity, Post-Wishlist Re-engagement Failure, etc.) |
+| **4. Quantification & Prioritization** | For each opportunity area, compute: frequency of mention (share of corpus), cross-source triangulation (how many distinct platforms surface it independently), segment prevalence (which user groups mention it most), and a composite "opportunity score" combining frequency × triangulation × inferred impact on conversion |
+
+Output should allow direct comparison across opportunity areas — e.g., a ranked table/dashboard, not a narrative summary — so the Growth Team can prioritize which underlying problem to solve first.
+
+---
+
+## 6. System Architecture Pattern: NOT a RAG Chatbot
+
+**This system must be built as an LLM-powered batch analytics pipeline, not a retrieval-augmented-generation (RAG) chatbot.** RAG is designed for ad-hoc, one-question-at-a-time retrieval-then-answer interactions. This problem instead requires systematic, corpus-wide extraction and quantification across every item in the dataset. Antigravity should not default to a standard RAG chatbot template.
+
+The pipeline should have three stages:
+
+1. **Extraction stage:** Every review/comment/post is passed through Gemini with a structured extraction prompt that returns structured output (JSON) — discrete reasons/behaviors tagged against an evolving taxonomy — not free-text answers to questions.
+2. **Aggregation stage:** Structured tags are counted, clustered, and cross-tabulated by source, segment, and category. This is a data engineering/analytics layer, not a conversational layer.
+3. **Dashboard stage:** The frontend visualizes the aggregated, quantified output (ranked opportunity areas, breakdowns, trends).
+
+**Optional exploratory layer (nice-to-have, not core):** A RAG-based "drill into the evidence" chatbot can sit on top of the aggregated system for auditability — e.g., a PM asks "show me examples of fit-uncertainty complaints from Reddit" and it retrieves the actual source quotes backing a given opportunity area. This is supplementary and must not replace the core batch pipeline.
+
+---
+
+## 6a. Principle: Separating Business Context — Extraction vs. Scoring
+
+Business context (the wishlist-to-purchase conversion goal) must **not** be injected into the extraction stage prompts. Priming the extraction model with the business goal while it reads raw, unstructured reviews risks a leading-the-witness effect — the model will over-find conversion-related reasons that aren't genuinely present in the text, biasing discovery toward confirming an assumed narrative rather than surfacing what's actually there.
+
+Instead, business context must be applied in two clearly separated stages:
+
+- **Extraction stage — context-light, open-ended:** Gemini extracts whatever discrete reasons/behaviors/frictions appear in the text, regardless of whether they seem conversion-relevant. This preserves unbiased discovery.
+- **Scoring/prioritization stage — context-aware, business-weighted:** Once opportunity areas are extracted and clustered (unbiased), the business goal (30-day wishlist-to-purchase conversion) is applied to compute the composite opportunity score — weighting frequency × triangulation × inferred relevance to the conversion metric.
+
+This separation must be an explicit architectural principle in the build — not an implementation detail left to chance — so the system produces both unbiased discovery and business-relevant prioritization, rather than a pipeline that only ever finds what it was told to look for.
+
+---
+
+## 7. Technical Architecture (Deployment Requirements)
+
+- **Backend:** Deployed on **Railway**
+  - Handles data ingestion pipelines, corpus storage, LLM orchestration, and API endpoints serving processed insights to the frontend
+- **Frontend:** Deployed on **Vercel**
+  - Consumes backend APIs and renders the discovery engine dashboard
+  - **UI/UX must match designs provided separately (built in Google Stitch)** — the deployed prototype's visual design, layout, and component structure should faithfully implement the Stitch designs once supplied
+- **LLM:** **Gemini** (via API) for all extraction, classification, clustering-support, and summarization tasks
+- **Build environment:** Antigravity IDE
+
+---
+
+## 8. Expected Deliverable from This Phase
+
+A working, deployed prototype (backend on Railway + frontend on Vercel, UI per Google Stitch designs) that:
+
+1. Ingests a representative corpus from the sources listed in Section 3
+2. Processes it through Gemini to extract and cluster causal reasons (not sentiment)
+3. Presents a ranked, quantified view of opportunity areas addressing the research questions in Section 4
+4. Supports filtering/breakdown by user segment where inferable from the data
+5. Serves as the evidence base for the *next* phase: proposing a non-monetary solution to improve wishlist-to-purchase conversion
+
+**Explicitly out of scope for this phase:** proposing or designing the actual product solution/feature. This system's sole job is rigorous, quantified problem discovery.
+
+---
+
+## 9. Success Criteria for the Discovery Engine Itself
+
+- Opportunity areas are traceable back to source evidence (auditable, not black-box)
+- Findings are triangulated across ≥2 independent source types before being treated as a strong signal
+- Output distinguishes correlation-level observations from higher-confidence, cross-validated patterns
+- Segment-level differences are surfaced, not averaged away
+- Extraction remains free of business-goal priming; business context is applied only at the scoring/prioritization layer (per Section 6a)
+- The system produces a clear, ranked shortlist of opportunity areas — ready to feed into solution ideation in the next phase

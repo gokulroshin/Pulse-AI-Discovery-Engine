@@ -1,0 +1,60 @@
+[
+  {
+    "input_doc_id": "doc_sample_01",
+    "input_text": "I really love the embroidery on this Anouk Anarkali kurta, but the size chart says 38 bust is M while the reviews are saying it fits extremely tight around the shoulders. I'm hesitating to place the order because returns take over a week.",
+    "output_items": [
+      {
+        "reason_text": "Aesthetic appreciation for the garment's embroidery design drives initial purchase interest",
+        "verbatim_quote": "I really love the embroidery on this Anouk Anarkali kurta",
+        "confidence": "high",
+        "signal_type": "motivation",
+        "preliminary_cluster_hint": "embroidery_aesthetic_appeal"
+      },
+      {
+        "reason_text": "Discrepancy between published size chart measurements and user review fit feedback causes sizing uncertainty",
+        "verbatim_quote": "size chart says 38 bust is M while the reviews are saying it fits extremely tight around the shoulders",
+        "confidence": "high",
+        "signal_type": "friction",
+        "preliminary_cluster_hint": "size_chart_discrepancy"
+      },
+      {
+        "reason_text": "Friction and perceived delay in the return process deters order completion when sizing is uncertain",
+        "verbatim_quote": "hesitating to place the order because returns take over a week",
+        "confidence": "high",
+        "signal_type": "friction",
+        "preliminary_cluster_hint": "return_friction_hesitation"
+      }
+    ]
+  },
+  {
+    "input_doc_id": "doc_sample_02",
+    "input_text": "Saved 4 different black tailored trousers from Zara and Roadster. Can't easily compare the fabric GSM and rise side-by-side, so I keep deferring the decision every weekend.",
+    "output_items": [
+      {
+        "reason_text": "Lack of structured side-by-side specification comparison tools leads to decision deferral and evaluation paralysis",
+        "verbatim_quote": "Can't easily compare the fabric GSM and rise side-by-side, so I keep deferring the decision every weekend",
+        "confidence": "high",
+        "signal_type": "comparison",
+        "preliminary_cluster_hint": "cross_option_evaluation_friction"
+      }
+    ]
+  },
+  {
+    "input_doc_id": "doc_sample_03",
+    "input_text": "Kurta bohot sundar hai but customer review photos ek bhi nahi hai, sirf generic 5 star ratings. Without seeing real lighting pictures I cannot trust the color accuracy.",
+    "output_items": [
+      {
+        "reason_text": "Absence of customer photo reviews undermines trust in marketplace ratings and creates color accuracy hesitation",
+        "verbatim_quote": "customer review photos ek bhi nahi hai, sirf generic 5 star ratings. Without seeing real lighting pictures I cannot trust the color accuracy",
+        "confidence": "high",
+        "signal_type": "friction",
+        "preliminary_cluster_hint": "visual_review_authenticity_trust"
+      }
+    ]
+  },
+  {
+    "input_doc_id": "doc_sample_04",
+    "input_text": "Fast delivery. Good app.",
+    "output_items": []
+  }
+]

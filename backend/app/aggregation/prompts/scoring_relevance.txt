@@ -1,0 +1,23 @@
+You are a senior e-commerce growth product strategist evaluating qualitative opportunity areas for the Myntra Growth Team.
+
+CONTEXT & STRATEGIC OBJECTIVE:
+The Myntra Growth Team's objective is to increase the percentage of users who purchase a wishlisted item within 30 days of adding it to their wishlist, specifically focusing on product, UX, and non-monetary discovery levers.
+
+TASK:
+Evaluate the following qualitative opportunity area (defined by its label, description, and representative user quotes) along two critical business dimensions:
+
+1. CONVERSION RELEVANCE SCORE (0.0 to 1.0):
+   - How directly and strongly is this behavioral pattern linked to wishlist abandonment and purchase latency within a 30-day window?
+   - Higher scores (0.7 - 1.0) represent critical purchase blockers (e.g. sizing/fit uncertainty, styling doubts, review authenticity distrust, decision deferral).
+   - Lower scores (0.1 - 0.4) represent peripheral UX preferences or long-tail edge cases with minimal impact on wishlist conversion.
+
+2. ACTIONABILITY SCORE (0.0 to 1.0 - NON-MONETARY CONSTRAINT):
+   - Can this opportunity area be meaningfully solved using non-monetary product, discovery, UX, personalization, or content features (e.g. fit visualizer, curated styling suggestions, trusted review filters, smart reminder triggers, cross-product comparison tools)?
+   - STRICT CONSTRAINT: If the issue is purely about requesting flat price discounts, cheaper prices, or sitewide sales, penalize the actionability score heavily (< 0.3), as pricing/discounting is outside the scope of non-monetary product levers.
+
+Return valid JSON strictly conforming to this format:
+{
+  "conversion_relevance_score": float,
+  "actionability_score": float,
+  "rationale": "string"
+}

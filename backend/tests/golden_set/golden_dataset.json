@@ -1,0 +1,142 @@
+[
+  {
+    "doc_id": "golden_01",
+    "category": "ethnic_wear",
+    "content_text": "I really love this Anouk Anarkali kurta, but the size chart says M is 38 bust while reviews say it fits extremely tight on shoulders. I am hesitating to order because returns take over a week.",
+    "expected_signals": ["motivation", "friction"],
+    "expected_reasons_contain": ["embroidery", "size", "shoulder", "return"]
+  },
+  {
+    "doc_id": "golden_02",
+    "category": "western",
+    "content_text": "Saved this Zara tailored blazer in my cart. Reviews say EU sizing runs one size smaller than Indian standard. Hard to decide between EUR 38 or 40 without a trial.",
+    "expected_signals": ["friction", "uncertainty"],
+    "expected_reasons_contain": ["sizing", "size", "trial", "standard"]
+  },
+  {
+    "doc_id": "golden_03",
+    "category": "western",
+    "content_text": "Anyone bought Roadster high-waist straight jeans recently? How is the waist-to-hip gap? Wishlisted forever because denim sizing on Myntra is such a gamble.",
+    "expected_signals": ["uncertainty", "external_validation"],
+    "expected_reasons_contain": ["waist", "denim", "sizing", "gamble"]
+  },
+  {
+    "doc_id": "golden_04",
+    "category": "western",
+    "content_text": "I love this olive green crop jacket from Vero Moda, but have no idea what bottoms or footwear to pair it with from my existing wardrobe. Wish there were complete outfit inspiration photos.",
+    "expected_signals": ["motivation", "friction", "uncertainty"],
+    "expected_reasons_contain": ["pair", "outfit", "wardrobe", "styling"]
+  },
+  {
+    "doc_id": "golden_05",
+    "category": "ethnic_wear",
+    "content_text": "Looked at reviews for Libas kurtas on Myntra and all top ratings have zero photos and generic 5-star comments like 'very nice'. Makes me distrust the rating completely so item stays in cart.",
+    "expected_signals": ["friction"],
+    "expected_reasons_contain": ["photo", "distrust", "rating", "review"]
+  },
+  {
+    "doc_id": "golden_06",
+    "category": "western",
+    "content_text": "I have 30+ items in my wishlist from H&M. Every weekend I open the app intending to buy 1-2 pieces, get overwhelmed by the options, and close the app without checking out.",
+    "expected_signals": ["friction", "behavior"],
+    "expected_reasons_contain": ["overwhelmed", "option", "defer", "checkout"]
+  },
+  {
+    "doc_id": "golden_07",
+    "category": "western",
+    "content_text": "Sent a screenshot of this Mango dress to my group chat to see if my friends think it suits me before buying. Waiting for their verdict before I place the order.",
+    "expected_signals": ["external_validation", "behavior"],
+    "expected_reasons_contain": ["friend", "chat", "verdict", "validation", "opinion"]
+  },
+  {
+    "doc_id": "golden_08",
+    "category": "ethnic_wear",
+    "content_text": "My Myntra wishlist is basically my moodboard for future wedding season. I have 50 items saved from Biba that I might never buy, just keeping them for design inspiration.",
+    "expected_signals": ["behavior", "motivation"],
+    "expected_reasons_contain": ["moodboard", "inspiration", "bookmark", "wedding"]
+  },
+  {
+    "doc_id": "golden_09",
+    "category": "footwear",
+    "content_text": "Wishlisted these HRX running sneakers. Some reviews say wide feet shoppers should go one size up, others say true to size. Need clearer insole width measurements.",
+    "expected_signals": ["uncertainty", "friction"],
+    "expected_reasons_contain": ["wide", "feet", "size", "measurement", "insole"]
+  },
+  {
+    "doc_id": "golden_10",
+    "category": "accessories",
+    "content_text": "Saved 6 Fossil and Titan leather wallets for gifting. Ended up not buying any because comparing card slots and coin pocket took too much effort.",
+    "expected_signals": ["comparison", "friction"],
+    "expected_reasons_contain": ["compar", "wallet", "effort", "pocket", "gift"]
+  },
+  {
+    "doc_id": "golden_11",
+    "category": "ethnic_wear",
+    "content_text": "Product description says 'cotton blend' for this Fabindia shirt, but doesn't mention exact percentage. If it has high polyester it will be unwearable in Indian humidity.",
+    "expected_signals": ["uncertainty", "friction"],
+    "expected_reasons_contain": ["cotton", "blend", "polyester", "fabric", "percentage"]
+  },
+  {
+    "doc_id": "golden_12",
+    "category": "western",
+    "content_text": "Color in studio image looks pastel lilac for this dress, but buyer review photos show dark muddy purple. Color accuracy is why I hesitate to pull the trigger.",
+    "expected_signals": ["friction", "uncertainty"],
+    "expected_reasons_contain": ["color", "accuracy", "studio", "lighting", "purple", "hesitate"]
+  },
+  {
+    "doc_id": "golden_13",
+    "category": "footwear",
+    "content_text": "Added Catwalk block heels to cart for an upcoming wedding, but worried about arch support and shoe bite. No information in description about sole cushioning.",
+    "expected_signals": ["uncertainty", "friction"],
+    "expected_reasons_contain": ["heel", "arch", "cushion", "bite", "support"]
+  },
+  {
+    "doc_id": "golden_14",
+    "category": "western",
+    "content_text": "Fabric thickness transparency is sorely missing for Roadster white t-shirts. Is it sheer or opaque? Hesitant to order without knowing GSM.",
+    "expected_signals": ["uncertainty", "friction"],
+    "expected_reasons_contain": ["gsm", "sheer", "opaque", "transparency", "thickness"]
+  },
+  {
+    "doc_id": "golden_15",
+    "category": "ethnic_wear",
+    "content_text": "Saved this heavy velvet lehenga from Aurelia in winter. Now summer is here and the event passed, so it just sits in my wishlist forgotten.",
+    "expected_signals": ["behavior", "friction"],
+    "expected_reasons_contain": ["season", "event", "passed", "forgotten", "summer", "winter"]
+  },
+  {
+    "doc_id": "golden_16",
+    "category": "western",
+    "content_text": "I use the wishlist icon like a Pinterest save button for Levi's outfits. Wish the app had sub-folders like 'Buying Next Week' vs 'Aspirational Moodboard'.",
+    "expected_signals": ["behavior", "friction"],
+    "expected_reasons_contain": ["folder", "pinterest", "save", "moodboard", "sub-folder"]
+  },
+  {
+    "doc_id": "golden_17",
+    "category": "ethnic_wear",
+    "content_text": "Kurti material has zero stretch. If you are between sizes definitely size up or you won't be able to breathe.",
+    "expected_signals": ["friction", "uncertainty"],
+    "expected_reasons_contain": ["stretch", "size", "breathe", "material"]
+  },
+  {
+    "doc_id": "golden_18",
+    "category": "western",
+    "content_text": "After 3 washes the color bled completely onto my white sneakers. Quality check needed for Mast & Harbour denim.",
+    "expected_signals": ["friction"],
+    "expected_reasons_contain": ["wash", "bleed", "color", "quality", "stitching"]
+  },
+  {
+    "doc_id": "golden_19",
+    "category": "general",
+    "content_text": "Great app, ordered yesterday and got it today. 5 stars!",
+    "expected_signals": [],
+    "expected_reasons_contain": []
+  },
+  {
+    "doc_id": "golden_20",
+    "category": "general",
+    "content_text": "Good experience. Recommended.",
+    "expected_signals": [],
+    "expected_reasons_contain": []
+  }
+]
