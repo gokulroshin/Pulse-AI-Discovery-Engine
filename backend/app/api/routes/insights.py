@@ -54,51 +54,51 @@ class InsightResponse(BaseModel):
     segment_nuances: Optional[Dict[str, str]] = None
 
 
-# Domain knowledge benchmark templates for the 3 core discovery questions
+# Domain knowledge benchmark templates for the 3 core discovery questions (written in simple everyday language)
 CORE_KNOWLEDGE_TEMPLATES = {
     "why_wishlist": {
         "keywords": ["why do users add fashion products to their wishlist", "why do users add", "bookmarking mechanism", "genuine purchase intent", "bookmark vs intent", "use the wishlist as genuine"],
-        "summary": "Users treat the wishlist as a dual-mode mechanism: 65% of additions serve as temporary visual moodboarding and price-drop tracking (low immediate intent), while 35% represent high-intent curation awaiting social validation or size availability.",
-        "detailed_synthesis": "Analysis across customer conversations reveals that wishlisting is heavily utilized as an emotional bookmarking mechanism rather than an immediate checkout pipeline. Users frequently add items to: (1) curate aesthetic lookbooks across multiple styles for upcoming events, (2) park items while waiting for external visual try-on feedback on Instagram/YouTube, and (3) monitor price drops and seasonal sales. High-intent wishlisting occurs when users have selected specific sizes and colors but hesitate at checkout due to post-order anxiety regarding sizing ambiguity and return friction.",
+        "summary": "Most shoppers use the wishlist as a digital fitting room or bookmark folder to save clothes they like, compare options later, and wait for prices to drop, rather than buying right away.",
+        "detailed_synthesis": "When people browse online fashion stores, they often find clothes they like but are not ready to buy immediately. Customer discussions across Reddit, app reviews, and YouTube show that people save items to their wishlist for three main reasons: (1) to create an outfit idea list for an upcoming party or event, (2) to ask friends or family for their opinion, and (3) to wait for discounts or festival sales. When shoppers are really interested in buying, they often still pause because they worry whether the size will fit them properly or if returning the item will be a headache.",
         "key_drivers": [
-            "Visual Moodboarding: Users save 10-20 complementary items to compare aesthetics before committing.",
-            "Price & Promotion Vigilance: Wishlists act as an alert queue for festival and flash sales.",
-            "Decision Deferral: Items are parked when sizing charts lack body-type reference photos.",
-            "Social Validation Delay: Users screenshot or share wishlisted links with peers before finalizing."
+            "Saving Clothes to Compare: Shoppers save multiple styles so they can easily compare them side-by-side before deciding.",
+            "Waiting for Sales & Price Drops: Using the wishlist as a reminder list to buy when discounts or deals go live.",
+            "Uncertainty About Fit & Sizing: Pausing before checkout because size charts are confusing or lack real customer photos.",
+            "Asking Friends for Advice: Sharing saved links with friends or family before spending money."
         ],
         "segment_nuances": {
-            "ethnic_wear": "Higher bookmarking volume for weddings and festive occasions with 3-4 week lead times.",
-            "western_wear": "Faster turnaround from wishlist to cart when sizing reviews include height/weight measurements."
+            "ethnic_wear": "Shoppers save outfits weeks in advance for weddings and festivals while deciding on matching jewelry.",
+            "western_wear": "Shoppers buy faster once they see customer reviews mentioning height, weight, and exact fit."
         }
     },
     "purchase_prevention": {
         "keywords": ["what prevents wishlisted products from eventually being purchased", "prevents wishlisted products from eventually", "why wishlisted products are not bought", "barriers preventing wishlisted"],
-        "summary": "The primary barriers preventing wishlisted items from converting are sizing confidence deficit, fear of return/refund friction, unexpected automatic cancellations, and lack of real-life drape/fabric visualization.",
-        "detailed_synthesis": "Even when customer desire is high, purchase execution breaks down at the point of decision confidence. The #1 cited reason is uncertainty around sizing consistency across different marketplace brands, followed by negative past experiences with customer support during return pickups and refund delays. Furthermore, users frequently encounter post-confirmation cancellations during sale events, leading to platform distrust.",
+        "summary": "The main reasons wishlisted items are not bought are confusion over sizing, fear of difficult returns or delayed refunds, unexpected order cancellations, and not knowing what the fabric looks like in real life.",
+        "detailed_synthesis": "Even when shoppers really love an outfit in their wishlist, they often stop right before checkout. The number one reason is doubt about whether the size will fit properly across different brands. Shoppers also worry about bad return experiences, like delayed pickup agents or slow refunds. On top of that, when apps unexpectedly cancel confirmed orders during major sales, shoppers lose trust and hesitate to pay upfront.",
         "key_drivers": [
-            "Fit & Sizing Ambiguity: Sizing charts fail to convey fabric stretch, drape, and proportional fit.",
-            "Return & Refund Anxiety: App refund delays and difficult pickup scheduling deter impulse buys.",
-            "Review Authenticity Skepticism: Generic 5-star ratings without pictures create suspicion of fake reviews.",
-            "Post-Order Distrust: Previous order cancellations create hesitation to pay upfront."
+            "Confusing Sizes & Fit: Size charts don't explain if the fabric stretches, shrinks, or fits loose.",
+            "Worries About Returns & Refunds: Delays in getting money back or difficult return pickups stop people from buying.",
+            "Doubt About Online Reviews: Generic 5-star reviews without real customer photos make shoppers suspicious.",
+            "Fear of Order Cancellations: Bad past experiences with sudden order cancellations make shoppers hesitate."
         ],
         "segment_nuances": {
-            "ethnic_wear": "Heavy return anxiety regarding blouse fitting and kurti chest/hip proportions.",
-            "footwear": "Extreme sizing divergence between sports and formal footwear brands halts checkout."
+            "ethnic_wear": "High worry about tight blouse armholes, kurti chest fit, and scratchy inner linings.",
+            "footwear": "Shoppers hesitate because sizes differ greatly between formal shoes and sports sneakers."
         }
     },
     "uncertainties_remaining": {
         "keywords": ["what uncertainties remain after users have identified a product they like", "what uncertainties remain after", "uncertainties remain after users", "identified a product they like"],
-        "summary": "After finding a liked product, users harbor lingering uncertainties about true color in natural light, fabric thickness/transparency, longevity after washing, and accurate sizing across body types.",
-        "detailed_synthesis": "Catalog studio lighting often misrepresents subtle undertones and fabric texture. Customer discussions on Reddit and YouTube reveal that users frequently search for unboxing videos specifically to verify if colors look duller in daylight or if fabrics feel synthetic and itchy. The lack of standardized customer photo reviews with height/bust/waist measurements remains a decisive hesitation point.",
+        "summary": "Even after finding a product they like, shoppers still worry if the true color looks different in daylight, if the fabric is thin or see-through, if it will shrink after washing, and if the size will actually fit.",
+        "detailed_synthesis": "Studio lighting in catalog photos often makes clothes look brighter or shinier than they appear in real life. Customer discussions on Reddit and YouTube reveal that shoppers frequently search for unboxing and try-on videos just to see if the colors are duller in daylight or if the material feels cheap and itchy. Not having clear photos from everyday customers with their height and measurements is one of the biggest reasons people hesitate.",
         "key_drivers": [
-            "Color Fidelity: Studio lighting obscures actual fabric shade and natural sunlight reflectance.",
-            "Fabric Quality & Transparency: Inability to gauge fabric weight, lining, and breathability.",
-            "Wash & Wear Durability: Fear of color bleeding, shrinkage, or fabric pilling after first wash.",
-            "Sizing Inconsistency: Different cuts (slim fit vs regular) within the same brand create sizing doubt."
+            "Color Differences: Studio studio lights hide the actual shade of the fabric in natural light.",
+            "Fabric Quality & Thickness: It's hard to tell from a screen if the material is see-through, rough, or breathable.",
+            "Washing & Durability: Fear that colors will bleed, clothes will shrink, or fabric will get fuzzy after one wash.",
+            "Inconsistent Sizing: Different cuts (slim fit vs regular fit) in the same brand leave shoppers confused."
         ],
         "segment_nuances": {
-            "ethnic_wear": "Uncertainty on embroidery weight, zari scratchiness, and inner lining quality.",
-            "western_wear": "Uncertainty on denim stiffness, waist rise, and crop top length."
+            "ethnic_wear": "Doubts about heavy embroidery weight, itchy zari threads, and whether an inner lining is included.",
+            "western_wear": "Doubts about stiff denim jeans, waist rise, and crop top length on taller or shorter body types."
         }
     }
 }
@@ -125,7 +125,7 @@ def call_gemini_rag_synthesis(
     retrieved_quotes: List[InsightSourceQuote],
     relevant_opps: List[LinkedOpportunity]
 ) -> Optional[Dict[str, Any]]:
-    """Query Gemini with automatic model cascading to synthesize an accurate, evidence-grounded answer."""
+    """Query Gemini with automatic model cascading to synthesize an accurate, evidence-grounded answer in simple everyday language."""
     if not settings.GEMINI_API_KEY:
         return None
 
@@ -152,9 +152,14 @@ def call_gemini_rag_synthesis(
     taxonomy_text = "\n".join(opp_lines)
 
     system_instruction = (
-        "You are the Pulse AI Consumer Discovery Engine, an expert ethnographic and product discovery assistant for fashion e-commerce. "
-        "Your task is to thoroughly analyze the user's question, understand their core intent (including natural typos, colloquialisms, and exploratory topics like decision fatigue, sizing, return anxiety, styling, etc.), "
-        "and provide a direct, insightful, and comprehensive answer grounded strictly in real consumer feedback and scraped customer reviews from Reddit, Google Play Store, Apple App Store, and YouTube. "
+        "You are Pulse AI, an intelligent shopping insights assistant for fashion e-commerce. "
+        "Your task is to analyze real customer reviews and discussions from Reddit, Google Play Store, Apple App Store, and YouTube, "
+        "and provide clear, simple, and direct answers to the user's question. "
+        "\nCRITICAL LANGUAGE & TONE REQUIREMENT: "
+        "Explain everything in plain, simple, everyday English that a common man or everyday shopper can easily understand at a glance. "
+        "NEVER use heavy academic jargon, consulting buzzwords, or complicated phrasing (e.g. do NOT use terms like 'ethnographic heuristics', 'bimodal bookmarking mechanisms', 'cognitive friction vectors', or 'decision deferral pipelines'). "
+        "Instead, write in clear everyday human terms like 'shoppers worry if...', 'people save items because...', 'customers get confused when sizes don't match'. "
+        "Keep your points friendly, clear, relatable, and grounded in real customer quotes and evidence. "
         "Your output must be valid JSON matching the specified schema with zero markdown fences."
     )
 
@@ -162,14 +167,14 @@ def call_gemini_rag_synthesis(
         f"USER QUESTION: {question}\n\n"
         f"RETRIEVED MULTI-CHANNEL CUSTOMER REVIEWS & EVIDENCE:\n{evidence_text}\n\n"
         f"GLOBAL OPPORTUNITY THEMES IDENTIFIED IN CORPUS:\n{taxonomy_text}\n\n"
-        "Generate a structured JSON response with the following keys:\n"
+        "Generate a structured JSON response in simple, easy-to-understand everyday language with the following keys:\n"
         "{\n"
-        '  "summary": "1-2 sentence direct, conclusive executive takeaway answering the question directly (e.g. Yes/No with key rationale)",\n'
-        '  "detailed_synthesis": "2-3 well-structured, insightful paragraphs explaining the underlying consumer psychology, behavioral bottlenecks, review patterns, and decision hesitations with rich narrative clarity",\n'
-        '  "key_drivers": ["4-6 concrete, specific behavioral drivers or friction factors identified in user discussions"],\n'
+        '  "summary": "1-2 clear, simple sentences giving a direct and straightforward answer that any everyday person can immediately understand",\n'
+        '  "detailed_synthesis": "2-3 well-structured paragraphs in simple, everyday language explaining what real shoppers experience, why they feel that way, and what problems or hesitations stop them from buying",\n'
+        '  "key_drivers": ["4-6 simple, clear bullet points describing the main everyday reasons or problems shoppers talk about (e.g. \'Confusing size charts that don\'t match real body sizes\', \'Fear of difficult returns or delayed refunds\')"],\n'
         '  "segment_nuances": {\n'
-        '    "ethnic_wear": "Specific behavior/nuance in ethnic/traditional wear",\n'
-        '    "western_wear": "Specific behavior/nuance in western wear or daily fashion"\n'
+        '    "ethnic_wear": "Simple explanation of how this affects ethnic/traditional wear (e.g., kurtis, sarees, lehengas)",\n'
+        '    "western_wear": "Simple explanation of how this affects western wear or daily clothes (e.g., jeans, t-shirts, dresses)"\n'
         "  }\n"
         "}"
     )
@@ -329,10 +334,10 @@ def ask_ai_insight(
             summary=llm_synthesis["summary"],
             detailed_synthesis=llm_synthesis["detailed_synthesis"],
             key_drivers=llm_synthesis.get("key_drivers", [
-                "Catalog choice overload and similarity across options",
-                "Cognitive friction comparing reviews and size charts",
-                "Lack of standardized try-on photos causing hesitation",
-                "Purchase deferral into wishlist rather than immediate cart checkout"
+                "Too many similar choices make it hard to decide",
+                "Confusing size charts that don't match real body sizes",
+                "Lack of real customer photos showing how clothes fit",
+                "Saving items to wishlist instead of buying right away"
             ]),
             supporting_evidence=supporting_quotes[:5],
             linked_opportunities=linked_opps,
@@ -343,21 +348,21 @@ def ask_ai_insight(
     top_reasons = [q.reason_text for q in supporting_quotes[:4]]
     return InsightResponse(
         question=question,
-        summary=f"Analysis of consumer feedback reveals that users frequently experience significant friction and hesitation when evaluating fashion items, driven by {top_reasons[0].lower() if top_reasons else 'information ambiguity and sizing doubt'}.",
+        summary=f"Shopper reviews and feedback show that people frequently hesitate to buy fashion online, mainly because of {top_reasons[0].lower() if top_reasons else 'confusion about sizing, fabric quality, and return hassles'}.",
         detailed_synthesis=(
-            f"When navigating marketplace catalogs, consumers encounter several cognitive bottlenecks. Customer discussions across Reddit, App Store, and Google Play highlight that {', '.join(top_reasons[:3]) if len(top_reasons) >= 3 else 'information overload and ambiguous size charts'} cause users to defer immediate checkout. "
-            "Instead of completing orders, users frequently bookmark items in wishlists or exit apps to seek external validation on social platforms like YouTube."
+            f"When looking through online fashion stores, everyday shoppers face several common problems. Real customer discussions on Reddit, app store reviews, and YouTube show that issues like {', '.join(top_reasons[:3]) if len(top_reasons) >= 3 else 'unclear size charts and hard-to-judge fabric quality'} make people pause before checking out. "
+            "Rather than buying immediately, most shoppers save items to their wishlist to compare later, wait for discounts, or search for try-on videos to see how clothes look in real life."
         ),
         key_drivers=[
-            f"Catalog & Comparison Friction: {top_reasons[0]}" if len(top_reasons) > 0 else "Analysis paralysis from catalog choices",
-            f"Information Uncertainty: {top_reasons[1]}" if len(top_reasons) > 1 else "Uncertainty around product specifications and fit",
-            f"Operational Anxiety: {top_reasons[2]}" if len(top_reasons) > 2 else "Post-order return and refund concerns",
-            "Multi-Source Triangulation: Corroborated across Reddit discussions and verified app reviews"
+            f"Difficult Choices: {top_reasons[0]}" if len(top_reasons) > 0 else "Too many similar options make it hard to choose",
+            f"Unclear Details: {top_reasons[1]}" if len(top_reasons) > 1 else "Unclear size charts and doubts about actual fit",
+            f"Return & Refund Worries: {top_reasons[2]}" if len(top_reasons) > 2 else "Worrying about return pickups or refund delays",
+            "Real Consumer Feedback: Corroborated across Reddit discussions and verified app reviews"
         ],
         supporting_evidence=supporting_quotes[:5],
         linked_opportunities=linked_opps,
         segment_nuances={
-            "ethnic_wear": "Higher dependency on fabric transparency reviews and drape verification.",
-            "western_wear": "Fast-paced trend evaluation with high sensitivity to stretch and fit measurements."
+            "ethnic_wear": "Shoppers worry if fabric is see-through, scratchy, or if the stitched fit will match.",
+            "western_wear": "Shoppers look for exact stretch, waist fit, and how the garment fits on different body heights."
         },
     )
