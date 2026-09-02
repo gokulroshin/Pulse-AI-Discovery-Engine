@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.api.routes import health, corpus, pipeline, extractions, opportunities, evidence, segments, taxonomy
+from app.api.routes import health, corpus, pipeline, extractions, opportunities, evidence, segments, taxonomy, insights
 from app.db.base import Base
 from app.db.session import engine
 
@@ -90,8 +90,6 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
-
-from app.api.routes import health, corpus, pipeline, extractions, opportunities, evidence, segments, taxonomy, insights
 
 # Register Routers
 app.include_router(health.router)

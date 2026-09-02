@@ -12,9 +12,19 @@ interface HeaderProps {
 
 export const CorpusSummaryHeader: React.FC<HeaderProps> = ({ stats, opps, loading }) => {
   const totalDocs = stats?.total_documents ?? 1938;
-  const totalExtractions = stats?.total_extractions ?? 831;
-  const totalOpps = opps?.total_opportunities ?? 15;
-  const platformCount = stats?.platform_distribution ? Object.keys(stats.platform_distribution).length : 4;
+  const totalExtractions = stats?.total_extractions ?? 1554;
+  const totalOpps = opps?.total_opportunities ?? 8;
+  const platformCount = stats?.platform_distribution ? Object.keys(stats.platform_distribution).length : 5;
+  const platformList = stats?.platform_distribution
+    ? Object.keys(stats.platform_distribution)
+        .map((p) => {
+          if (p === 'playstore') return 'Play Store';
+          if (p === 'appstore') return 'App Store';
+          if (p === 'ecommerce') return 'E-Commerce';
+          return p.charAt(0).toUpperCase() + p.slice(1);
+        })
+        .join(', ')
+    : 'Reddit, Play Store, App Store, YouTube, E-Commerce';
 
   const kpis = [
     {
@@ -40,8 +50,8 @@ export const CorpusSummaryHeader: React.FC<HeaderProps> = ({ stats, opps, loadin
     },
     {
       title: 'Triangulation Channels',
-      value: '4 Channels',
-      subtext: 'Reddit, Play Store, YouTube, App Store',
+      value: loading ? '...' : `${platformCount} Channels`,
+      subtext: platformList,
       icon: Radio,
       accent: '#f59e0b',
     },

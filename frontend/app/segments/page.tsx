@@ -3,41 +3,48 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { OpportunityItem } from '@/lib/types';
 import { LoadingSpinner } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { ScoreBadge, PlatformBadge } from '@/components/shared/Badge';
 import {
   PieChart,
-  Layers,
   ChevronRight,
-  Sparkles,
   Shirt,
   User,
   Tag,
-  Filter,
 } from 'lucide-react';
 
 interface SegmentBreakdownResponse {
   dimension: string;
   total_opportunities: number;
-  breakdown: Record<
-    string,
-    Array<{
-      node_id: string;
-      label: string;
-      composite_score: number;
-      rank: number;
-      segment_share: number;
-    }>
-  >;
+  breakdown: Array<{
+    node_id: string;
+    label: string;
+    composite_score: number;
+    rank: number;
+    segment_distribution: Record<string, number>;
+  }>;
 }
 
 const DIMENSIONS = [
-  { id: 'category', label: 'Product Category', icon: Shirt, values: ['ethnic_wear', 'western_wear', 'footwear'] },
-  { id: 'gender', label: 'Gender Context', icon: User, values: ['women', 'men', 'unisex'] },
-  { id: 'brand_tier', label: 'Brand & Price Tier', icon: Tag, values: ['premium', 'mid', 'value'] },
+  { id: 'category', label: 'Product Category', icon: Shirt },
+  { id: 'gender', label: 'Gender Context', icon: User },
+  { id: 'brand_tier', label: 'Brand & Price Tier', icon: Tag },
 ];
+
+const SEGMENT_LABELS: Record<string, string> = {
+  ethnic_wear: 'Ethnic Wear',
+  western: 'Western Wear',
+  western_wear: 'Western Wear',
+  general: 'General Fashion & Apparel',
+  footwear: 'Footwear',
+  accessories: 'Accessories & Jewelry',
+  women: "Women's Fashion",
+  men: "Men's Fashion",
+  unisex: 'Unisex',
+  premium: 'Premium Brand Tier',
+  mid: 'Mid-Market Tier',
+  value: 'Value & Budget Tier',
+};
 
 export default function SegmentExplorerPage() {
   const [selectedDimension, setSelectedDimension] = useState('category');
@@ -49,7 +56,7 @@ export default function SegmentExplorerPage() {
       setLoading(true);
       try {
         const data = await api.getSegmentBreakdown(selectedDimension);
-        setBreakdownData(data);
+        setBreakdownData(data as any);
       } catch (err) {
         console.error('Failed to load segment breakdown:', err);
       } finally {
@@ -64,44 +71,70 @@ export default function SegmentExplorerPage() {
   const groupedBySegment = React.useMemo(() => {
     if (!breakdownData?.breakdown) return {};
 
-    if (!Array.isArray(breakdownData.breakdown)) {
-      return breakdownData.breakdown;
-    }
+    const dict: Record<
+      string,
+      Array<{
+        node_id: string;
+        label: string;
+        composite_score: number;
+        rank: number;
+        segment_share: number;
+      }>
+    > = {};
 
-    const dict: Record<string, Array<{
-      node_id: string;
-      label: string;
-      composite_score: number;
-      rank: number;
-      segment_share: number;
-    }>> = {};
+    if (Array.isArray(breakdownData.breakdown)) {
+      breakdownData.breakdown.forEach((item: any) => {
+        const dist = item.segment_distribution || {};
+        Object.entries(dist).forEach(([rawKey, share]: [string, any]) => {
+          const shareVal = Number(share);
+          // Only associate if non-trivial correlation
+          if (shareVal <= 0.03) return;
 
-    activeDimensionMeta.values.forEach((valKey) => {
-      dict[valKey] = [];
-    });
+          // Exclude generic unclassified gender
+          if (selectedDimension === 'gender' && rawKey === 'unknown') return;
 
-    breakdownData.breakdown.forEach((item: any) => {
-      const dist = item.segment_distribution || {};
-      Object.entries(dist).forEach(([valKey, share]: [string, any]) => {
-        if (!dict[valKey]) dict[valKey] = [];
-        if (Number(share) > 0.05) {
-          dict[valKey].push({
+          // Normalize category naming
+          const normalizedKey = rawKey === 'western' ? 'western_wear' : rawKey;
+          if (!dict[normalizedKey]) {
+            dict[normalizedKey] = [];
+          }
+
+          dict[normalizedKey].push({
             node_id: item.node_id,
             label: item.label,
             composite_score: item.composite_score,
             rank: item.rank,
-            segment_share: Number(share),
+            segment_share: shareVal,
           });
-        }
+        });
       });
-    });
+    }
 
+    // Sort opportunities within each segment by share
     Object.keys(dict).forEach((k) => {
       dict[k].sort((a, b) => b.segment_share - a.segment_share);
     });
 
-    return dict;
-  }, [breakdownData, activeDimensionMeta]);
+    // Strictly filter out any categories having 0 opportunities
+    const filteredDict: Record<
+      string,
+      Array<{
+        node_id: string;
+        label: string;
+        composite_score: number;
+        rank: number;
+        segment_share: number;
+      }>
+    > = {};
+
+    Object.entries(dict).forEach(([key, list]) => {
+      if (list && list.length >= 1) {
+        filteredDict[key] = list;
+      }
+    });
+
+    return filteredDict;
+  }, [breakdownData, selectedDimension]);
 
   return (
     <div style={{ padding: '32px 36px', maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
@@ -191,8 +224,8 @@ export default function SegmentExplorerPage() {
         <LoadingSpinner text={`Analyzing ${activeDimensionMeta.label} distributions...`} />
       ) : Object.keys(groupedBySegment).length === 0 ? (
         <EmptyState
-          title="No Segment Breakdown Available"
-          description="Ensure the pipeline has run and extractions have segment tags populated."
+          title="No Active Segment Opportunities"
+          description="No opportunity clusters matched this dimension filter with significant prevalence."
           icon={PieChart}
         />
       ) : (
@@ -233,11 +266,10 @@ export default function SegmentExplorerPage() {
                       fontSize: '1.15rem',
                       fontWeight: 700,
                       color: 'var(--text-primary)',
-                      textTransform: 'capitalize',
                       margin: 0,
                     }}
                   >
-                    {segmentKey.replace('_', ' ')}
+                    {SEGMENT_LABELS[segmentKey] || segmentKey.replace('_', ' ')}
                   </h3>
                 </div>
                 <span
@@ -250,13 +282,13 @@ export default function SegmentExplorerPage() {
                     fontWeight: 600,
                   }}
                 >
-                  {oppList.length} Opportunities
+                  {oppList.length} {oppList.length === 1 ? 'Opportunity' : 'Opportunities'}
                 </span>
               </div>
 
               {/* Ranked opportunities in this segment */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {oppList.map((item, idx) => (
+                {oppList.map((item) => (
                   <Link
                     key={item.node_id}
                     href={`/opportunities/${item.node_id}`}

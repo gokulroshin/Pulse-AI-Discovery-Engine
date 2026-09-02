@@ -35,13 +35,23 @@ def get_opportunities(
     if confidence:
         query = query.filter(OpportunityScore.confidence_level == confidence.lower())
 
-    scores = query.limit(limit).all()
+    scores = query.all()
     corpus_size = db.query(RawDocument).count()
     latest_score = scores[0] if scores else None
 
     results = []
+    seen_labels = set()
+    current_rank = 1
+
     for s in scores:
         node = s.taxonomy_node
+        if not node or not node.label:
+            continue
+        clean_label = node.label.strip()
+        if clean_label in seen_labels:
+            continue
+        seen_labels.add(clean_label)
+
         # Extract top sources and top segments
         platform_breakdown = s.source_platform_breakdown or {}
         top_sources = sorted(platform_breakdown.keys(), key=lambda k: platform_breakdown[k], reverse=True)[:3]
@@ -55,9 +65,9 @@ def get_opportunities(
 
         results.append({
             "score_id": s.score_id,
-            "rank": s.rank,
+            "rank": current_rank,
             "node_id": node.node_id if node else None,
-            "label": node.label if node else "Unknown",
+            "label": clean_label,
             "description": node.description if node else "",
             "composite_score": s.composite_score,
             "frequency_score": s.frequency_score,
@@ -72,6 +82,9 @@ def get_opportunities(
             "representative_quotes": node.representative_quotes if node else [],
             "status": node.status if node else "auto_generated",
         })
+        current_rank += 1
+        if len(results) >= limit:
+            break
 
     return {
         "scoring_run_id": latest_score.scoring_run_id if latest_score else None,

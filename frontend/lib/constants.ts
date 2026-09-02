@@ -1,8 +1,8 @@
 export const APP_CONFIG = {
   name: 'Pulse',
-  tagline: 'AI Consumer Discovery & Wishlist Behavior Engine',
+  tagline: 'Consumer Behaviour Discovery Engine',
   team: 'Fashion E-Commerce Product Intelligence',
-  targetMetric: 'Wishlist Intent & Consumer Friction Discovery',
+  targetMetric: 'Consumer Behaviour & Intent Intelligence',
   mission: 'Continuous unstructured customer feedback ingestion, causal extraction, semantic clustering, and qualitative opportunity discovery.',
 };
 

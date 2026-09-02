@@ -126,12 +126,12 @@ class TaxonomyManager:
 
         heuristics = [
             (
-                ["fit", "size", "sizing", "tight", "loose", "chart", "body type", "measurement"],
+                ["fit", "size", "sizing", "tight", "loose", "chart", "body type", "measurement", "chest", "waist", "bust"],
                 "Fit & Sizing Confidence Gap",
                 "User hesitation caused by size inconsistency, unclear size charts, conflicting review signals, or inability to predict how clothing fits their specific body type."
             ),
             (
-                ["style", "outfit", "pair", "match", "wardrobe", "occasion", "look", "combine"],
+                ["style", "outfit", "pair", "match", "wardrobe", "occasion", "look", "combine", "accessories", "dupatta"],
                 "Styling & Outfit Context Deficit",
                 "Users struggle to visualize how an item can be styled with their existing wardrobe or worn for specific real-world occasions."
             ),
@@ -141,9 +141,29 @@ class TaxonomyManager:
                 "Distrust in on-platform review credibility, fear of sponsored/fake reviews, and an active search for authentic customer try-on photos."
             ),
             (
-                ["later", "wait", "save for", "defer", "thinking", "hesitat", "decide", "postpone", "procrastinat"],
-                "Decision Deferral & Evaluation Latency",
-                "Users proactively postpone purchase decisions despite high interest due to cognitive overload, lack of urgency, or choice paralysis."
+                ["fabric", "material", "quality", "stitch", "wash", "durab", "shrink", "color fade", "transparent", "see-through", "see through", "shine", "lighting"],
+                "Quality & Fabric Durability Uncertainty",
+                "Anxiety regarding true fabric tactile feel, transparency, stitching durability, and color accuracy relative to studio photos."
+            ),
+            (
+                ["return", "exchange", "refund", "pickup", "reverse pickup", "doorstep", "customer care", "customer support"],
+                "Post-Order & Return Policy Friction",
+                "Concerns regarding return window convenience, reverse pickup reliability, or exchange friction if the item does not fit."
+            ),
+            (
+                ["cancel", "cancelled", "cancellation", "out of stock", "shortage", "inventory"],
+                "Post-Confirmation Inventory & Order Cancellations",
+                "Distrust created when confirmed orders are abruptly canceled due to inventory synchronization failures during sales."
+            ),
+            (
+                ["delivery", "tracking", "courier", "delayed", "fake attempt", "shipping", "stuck"],
+                "Fulfillment & Delivery Tracking Friction",
+                "Friction caused by delayed shipments, inaccurate tracking notices, or uncoordinated doorstep delivery attempts."
+            ),
+            (
+                ["preliminary", "saving an item", "save an item", "wishlist for", "later", "wait", "save for", "defer", "thinking", "hesitat", "decide", "postpone", "procrastinat"],
+                "Wishlist Decision Deferral & Intent Latency",
+                "Users proactively save items as a preliminary step or postpone purchases due to choice paralysis, waiting for sales, or seeking secondary opinions."
             ),
             (
                 ["friend", "reddit", "ask", "opinion", "validation", "poll", "family", "compliment", "peer"],
@@ -165,16 +185,6 @@ class TaxonomyManager:
                 "Occasion Mismatch & Seasonality Shift",
                 "Purchase postponement because the target event or season has shifted, reducing immediate utility."
             ),
-            (
-                ["fabric", "material", "quality", "stitch", "wash", "durab", "shrink", "color fade", "transparent"],
-                "Quality & Fabric Durability Uncertainty",
-                "Anxiety regarding true fabric tactile feel, transparency, stitching durability, and color accuracy relative to studio photos."
-            ),
-            (
-                ["return", "exchange", "refund", "delivery", "shipping", "courier", "slow", "damaged"],
-                "Post-Order & Return Policy Friction",
-                "Concerns regarding return window convenience, reverse pickup reliability, or exchange friction if the item does not fit."
-            ),
         ]
 
         for keywords, label, desc in heuristics:
@@ -182,7 +192,7 @@ class TaxonomyManager:
                 return {
                     "label": label,
                     "description": desc,
-                    "representative_quotes": [q for q in quotes if q][:3] or reasons[:2],
+                    "representative_quotes": [q for q in quotes if q][:4] or reasons[:2],
                 }
 
         # Default fallback
@@ -191,7 +201,7 @@ class TaxonomyManager:
         return {
             "label": label,
             "description": f"Cluster of user feedback highlighting recurring frictions: {'; '.join(reasons[:2])}.",
-            "representative_quotes": [q for q in quotes if q][:3] or reasons[:2],
+            "representative_quotes": [q for q in quotes if q][:4] or reasons[:2],
         }
 
     def sync_taxonomy_to_db(
@@ -200,7 +210,7 @@ class TaxonomyManager:
         clusters: List[Dict[str, Any]],
         clear_existing: bool = True,
     ) -> List[TaxonomyNode]:
-        """Persist taxonomy nodes to database and link extractions to their assigned node."""
+        """Persist taxonomy nodes to database ensuring STRICTLY UNIQUE labels and consolidated extractions."""
         if clear_existing:
             from app.models.opportunity_score import OpportunityScore
             # Unlink extractions first
@@ -211,13 +221,35 @@ class TaxonomyManager:
             db.query(TaxonomyNode).filter(TaxonomyNode.status == "auto_generated").delete()
             db.commit()
 
+        # Consolidate clusters with identical or duplicate labels
+        consolidated: Dict[str, Dict[str, Any]] = {}
+        for c_data in clusters:
+            label = c_data["label"].strip()
+            if label not in consolidated:
+                consolidated[label] = {
+                    "label": label,
+                    "description": c_data.get("description", ""),
+                    "representative_quotes": list(c_data.get("representative_quotes", [])),
+                    "extraction_ids": list(c_data.get("extraction_ids", [])),
+                }
+            else:
+                # Merge quotes (deduplicate)
+                for q in c_data.get("representative_quotes", []):
+                    if q and q not in consolidated[label]["representative_quotes"]:
+                        consolidated[label]["representative_quotes"].append(q)
+                # Merge extraction IDs
+                consolidated[label]["extraction_ids"].extend(c_data.get("extraction_ids", []))
+                # Keep richer description
+                if len(c_data.get("description", "")) > len(consolidated[label]["description"]):
+                    consolidated[label]["description"] = c_data["description"]
+
         created_nodes = []
 
-        for c_data in clusters:
+        for c_data in consolidated.values():
             node = TaxonomyNode(
                 label=c_data["label"],
                 description=c_data["description"],
-                representative_quotes=c_data.get("representative_quotes", []),
+                representative_quotes=c_data.get("representative_quotes", [])[:5],
                 extraction_count=len(c_data.get("extraction_ids", [])),
                 status="auto_generated",
             )
@@ -237,7 +269,7 @@ class TaxonomyManager:
             created_nodes.append(node)
 
         db.commit()
-        logger.info(f"Successfully saved {len(created_nodes)} taxonomy nodes and mapped extractions.")
+        logger.info(f"Successfully saved {len(created_nodes)} STRICTLY UNIQUE taxonomy nodes and mapped extractions.")
         return created_nodes
 
 

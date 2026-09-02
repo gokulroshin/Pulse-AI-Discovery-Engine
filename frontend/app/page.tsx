@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '@/lib/api';
 import { OpportunitiesResponse, CorpusStats, OpportunityItem } from '@/lib/types';
 import { CorpusSummaryHeader } from '@/components/dashboard/CorpusSummaryHeader';
@@ -11,15 +11,16 @@ import { SourceDistributionPie } from '@/components/charts/SourceDistributionPie
 import { SegmentBreakdownChart } from '@/components/charts/SegmentBreakdownChart';
 import { LoadingSpinner } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { Sparkles, RefreshCw, Compass } from 'lucide-react';
+import { Sparkles, RefreshCw, Compass, WifiOff, Activity } from 'lucide-react';
 
 export default function DashboardHomePage() {
   const [oppsResponse, setOppsResponse] = useState<OpportunitiesResponse | null>(null);
   const [corpusStats, setCorpusStats] = useState<CorpusStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [oppsData, statsData] = await Promise.all([
         api.getOpportunities({ limit: 50 }),
@@ -27,17 +28,30 @@ export default function DashboardHomePage() {
       ]);
       setOppsResponse(oppsData);
       setCorpusStats(statsData);
-    } catch (err) {
+      setConnectionError(null);
+    } catch (err: any) {
       console.error('Error fetching dashboard data:', err);
+      setConnectionError(
+        'Connecting to Discovery Engine backend (http://localhost:8000)... Auto-reconnecting.'
+      );
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  // Auto-reconnect polling every 5s if disconnected
+  useEffect(() => {
+    if (!connectionError) return;
+    const interval = setInterval(() => {
+      fetchData();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [connectionError, fetchData]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -48,6 +62,41 @@ export default function DashboardHomePage() {
 
   return (
     <div style={{ padding: '32px 36px', maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
+      {/* Connection Reconnect Notification Bar if Backend Starting */}
+      {connectionError && !loading && (
+        <div
+          className="glass animate-fade-in"
+          style={{
+            marginBottom: '20px',
+            padding: '12px 20px',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Activity size={18} color="#f87171" className="animate-pulse" />
+            <span style={{ fontSize: '0.88rem', color: '#fca5a5', fontWeight: 500 }}>
+              {connectionError}
+            </span>
+          </div>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="btn-secondary"
+            style={{ padding: '6px 14px', fontSize: '0.78rem' }}
+          >
+            <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
+            Reconnect Now
+          </button>
+        </div>
+      )}
+
       {/* Top Banner */}
       <div
         style={{
@@ -83,7 +132,7 @@ export default function DashboardHomePage() {
               margin: 0,
             }}
           >
-            Wishlist & Purchase Discovery Engine
+            Consumer Behaviour Discovery Engine
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '4px', margin: 0 }}>
             Diagnose fashion consumer drop-offs, hesitation factors, and unmet needs grounded in real-world user reviews.
@@ -104,7 +153,7 @@ export default function DashboardHomePage() {
         </div>
       </div>
 
-      {/* Prominent AI Insight Search Bar with 10 Core Research Questions */}
+      {/* Prominent AI Insight Search Bar with Core Research Questions */}
       <AIInsightSearchBar />
 
       {/* Corpus Summary KPI Header */}
@@ -114,8 +163,12 @@ export default function DashboardHomePage() {
         <LoadingSpinner text="Analyzing opportunity scores and cross-channel matrices..." />
       ) : opportunities.length === 0 ? (
         <EmptyState
-          title="No Opportunities Discovered Yet"
-          description="The pipeline has not completed scoring on the ingested corpus."
+          title={connectionError ? 'Connecting to Discovery Engine...' : 'No Opportunities Discovered Yet'}
+          description={
+            connectionError
+              ? 'Attempting to establish connection with local backend server on port 8000...'
+              : 'The pipeline has not completed scoring on the ingested corpus.'
+          }
         />
       ) : (
         <>
