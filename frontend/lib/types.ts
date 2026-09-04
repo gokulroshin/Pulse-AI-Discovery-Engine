@@ -142,6 +142,7 @@ export interface CorpusStats {
   platform_distribution: Record<string, number>;
   category_distribution: Record<string, number>;
   gender_distribution: Record<string, number>;
+  brand_tier_distribution?: Record<string, number>;
   total_extractions: number;
   last_ingestion_at?: string | null;
 }

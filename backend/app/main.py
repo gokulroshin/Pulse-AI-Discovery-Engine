@@ -74,18 +74,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Configure CORS for seamless public access across Vercel, Railway, and localhost
-origins = settings.CORS_ORIGINS
-if isinstance(origins, str):
-    origins = [origins]
-
-is_wildcard = "*" in origins or origins == ["*"]
-
+# Configure CORS for seamless access across all devices, localhost, LAN IPs, and production domains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if is_wildcard else origins,
-    allow_origin_regex=r"https://.*" if not is_wildcard else None,
-    allow_credentials=False if is_wildcard else True,
+    allow_origin_regex=r".*",
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
