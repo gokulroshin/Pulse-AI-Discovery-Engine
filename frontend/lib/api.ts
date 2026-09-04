@@ -33,11 +33,27 @@ class ApiClient {
     this.apiKey = apiKey;
   }
 
+  private getEffectiveBaseUrl(): string {
+    if (this.baseUrl && this.baseUrl !== 'http://localhost:8000') {
+      return this.baseUrl;
+    }
+    if (
+      typeof window !== 'undefined' &&
+      window.location.hostname &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
+    ) {
+      return `${window.location.protocol}//${window.location.hostname}:8000`;
+    }
+    return this.baseUrl || 'http://localhost:8000';
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+    const base = this.getEffectiveBaseUrl().replace(/\/$/, '');
+    const url = `${base}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-API-Key': this.apiKey,
