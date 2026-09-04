@@ -50,6 +50,8 @@ lerna-debug.log*
 # Database
 *.sqlite3
 *.db
+!backend/intently.db
+!intently.db
 *.sql.gz
 
 # OS & IDE

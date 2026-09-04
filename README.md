@@ -7,8 +7,8 @@
 
 ## 🏛️ System Architecture
 
-Pulse operates as a **three-tier, continuous customer intelligence platform**:
-1. **Layer 1 (Multi-Channel Ingestion)**: Scrapes, normalizes, and deduplicates customer reviews and discussions across Google Play, Apple App Store, Reddit (`r/IndianFashionAddicts`, `r/Myntra`), and YouTube haul comments.
+Pulse operates as a **continuous, multi-channel customer intelligence platform**:
+1. **Layer 1 (Multi-Channel Ingestion)**: Scrapes, normalizes, and deduplicates customer reviews and discussions across Google Play, Apple App Store, Reddit (`r/IndianFashionAddicts`, `r/TwoXIndia`, `r/india`), and YouTube haul comments.
 2. **Layer 2 (Context-Light Causal Extraction)**: Extracts objective causal reasons, behavioral frictions, and verbatim quotes with Gemini (`gemini-2.5-flash`) without business KPI priming.
 3. **Layer 3 (Semantic Clustering & Taxonomy)**: Agglomerative hierarchical clustering with cosine distance and automated silhouette score optimization to construct an interpretable opportunity taxonomy.
 4. **Layer 4 (Business Opportunity Scoring & Q&A)**: Ranks opportunity areas by multi-dimensional composite impact ($\text{Frequency} \times \text{Triangulation} \times \text{Conversion Relevance} \times \text{Segment Breadth} \times \text{Actionability}$) and powers an interactive AI Question-Answering engine over the scraped corpus.
@@ -49,6 +49,7 @@ Pulse operates as a **three-tier, continuous customer intelligence platform**:
 │   │   └── main.py           # FastAPI entrypoint
 │   ├── scripts/              # Aggregation, extraction & audit CLI scripts
 │   ├── tests/                # 58 automated unit, integration & E2E tests
+│   ├── intently.db           # Pre-analyzed SQLite database (1,900+ records)
 │   ├── Dockerfile            # Container definition for backend
 │   └── railway.toml          # Railway production configuration
 │
@@ -57,9 +58,14 @@ Pulse operates as a **three-tier, continuous customer intelligence platform**:
 │   ├── components/           # UI components, AI search bar, charts, evidence explorers
 │   ├── lib/                  # API client, TypeScript models, constants
 │   ├── styles/               # Design system tokens & CSS styling
+│   ├── public/               # Static assets
 │   ├── Dockerfile            # Container definition for frontend
 │   └── vercel.json           # Vercel production deployment config
 │
+├── start_engine.py           # Universal 1-click cross-platform entrypoint
+├── start_engine.sh           # macOS & Linux 1-click launcher
+├── start_engine.bat          # Windows 1-click launcher
+├── run_engine_24x7.py        # Self-bootstrapping watchdog & supervisor daemon
 ├── docker-compose.yml        # Multi-container orchestration (FastAPI + Worker + Postgres + Redis + Next.js)
 ├── DEPLOYMENT.md             # Production deployment guide for Railway & Vercel
 ├── Architecture.md           # Technical architecture specifications
@@ -70,9 +76,51 @@ Pulse operates as a **three-tier, continuous customer intelligence platform**:
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 Quick Start Guide (Works on ANY Device)
 
-### 1. Local Development (Standard)
+The engine features **automated self-bootstrapping**: on its first run, it automatically verifies Python and Node dependencies, sets up configuration files from templates, syncs the pre-computed 1,900+ document qualitative corpus, and starts both the FastAPI backend and Next.js frontend with live watchdog supervision.
+
+### 1. 1-Click Launch (Recommended)
+
+#### **Windows**
+Double-click `start_engine.bat` or run:
+```cmd
+start_engine.bat
+```
+
+#### **macOS & Linux**
+```bash
+chmod +x start_engine.sh
+./start_engine.sh
+```
+
+#### **Universal Python CLI (Any OS)**
+```bash
+python start_engine.py
+```
+
+#### **npm CLI**
+```bash
+npm start
+```
+
+Once running:
+- **Interactive Intelligence Dashboard:** [http://localhost:3000](http://localhost:3000)
+- **FastAPI Interactive Swagger Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Backend Health Check:** [http://localhost:8000/health](http://localhost:8000/health)
+
+---
+
+### 2. Docker Containerized Stack
+
+Launch the full production stack with a single command (PostgreSQL 16, Redis 7, FastAPI backend, Celery worker, and Next.js 15 frontend):
+```bash
+docker compose up --build
+```
+
+---
+
+### 3. Manual Step-by-Step Setup
 
 #### Backend Setup
 ```bash
@@ -82,12 +130,10 @@ python -m venv .venv
 pip install -r requirements.txt
 cp .env.example .env
 
-# Run migrations & start FastAPI server
+# Run database schema migrations & start FastAPI server
 alembic upgrade head
 uvicorn app.main:app --reload --port 8000
 ```
-- **API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Health Check:** [http://localhost:8000/health](http://localhost:8000/health)
 
 #### Frontend Setup
 ```bash
@@ -95,24 +141,6 @@ cd frontend
 npm install
 npm run dev
 ```
-- **Dashboard:** [http://localhost:3000](http://localhost:3000)
-
----
-
-### 2. Local Containerized Stack (Docker Compose)
-
-Launch the full stack (PostgreSQL, Redis, FastAPI, Celery worker, and Next.js frontend):
-```bash
-docker-compose up --build
-```
-
----
-
-### 3. Production Cloud Deployment
-
-Detailed step-by-step instructions are available in [DEPLOYMENT.md](file:///d:/3.%20Career/Product%20Management/IDE/Myntra-%20Grad%20Project/AI%20Discovery%20Engine/DEPLOYMENT.md):
-- **Railway:** Deploys FastAPI backend + Celery worker + Managed PostgreSQL 16 + Redis 7.
-- **Vercel:** Deploys Next.js 15 frontend with automatic edge routing.
 
 ---
 
@@ -120,8 +148,7 @@ Detailed step-by-step instructions are available in [DEPLOYMENT.md](file:///d:/3
 
 ### Run Automated Pytest Suite (58 Test Cases)
 ```bash
-cd backend
-.venv\Scripts\pytest
+pytest backend/tests
 ```
 *Validates API endpoints, clustering algorithms, scoring models, prompt isolation, error handling, and E2E pipeline state machine.*
 

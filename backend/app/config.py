@@ -82,10 +82,18 @@ class Settings(BaseSettings):
         if value and value.startswith("postgresql://") and not value.startswith("postgresql+"):
             return value.replace("postgresql://", "postgresql+psycopg2://", 1)
         if value and value.startswith("sqlite:///./"):
-            # Resolve relative SQLite path relative to backend root
+            # Resolve relative SQLite path checking backend dir first, then workspace root
             db_name = value.replace("sqlite:///./", "")
-            base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-            db_path = os.path.join(base_dir, db_name).replace("\\", "/")
+            backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            root_dir = os.path.abspath(os.path.join(backend_dir, ".."))
+            backend_db = os.path.join(backend_dir, db_name)
+            root_db = os.path.join(root_dir, db_name)
+            if os.path.exists(backend_db):
+                db_path = backend_db.replace("\\", "/")
+            elif os.path.exists(root_db):
+                db_path = root_db.replace("\\", "/")
+            else:
+                db_path = backend_db.replace("\\", "/")
             return f"sqlite:///{db_path}"
         return value
 
