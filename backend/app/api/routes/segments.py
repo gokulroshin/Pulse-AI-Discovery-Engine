@@ -1,5 +1,6 @@
 """Segment analysis REST API endpoints."""
 
+import time
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
@@ -13,6 +14,15 @@ from app.models.taxonomy_node import TaxonomyNode
 
 router = APIRouter(prefix="/api/v1/segments", tags=["Segment Analytics"])
 
+# In-memory cache for ultra-fast response times
+_SEGMENT_CACHE: Dict[str, Any] = {}
+_CACHE_TIMESTAMP: float = 0.0
+_CACHE_TTL_SECONDS: float = 30.0
+
+
+def _is_cache_valid() -> bool:
+    return (time.time() - _CACHE_TIMESTAMP) < _CACHE_TTL_SECONDS
+
 
 @router.get("", summary="Get Available Segment Dimensions and Values")
 def get_segment_dimensions(
@@ -20,6 +30,10 @@ def get_segment_dimensions(
     _: str = Depends(verify_api_key),
 ) -> Dict[str, Any]:
     """List all available segment dimensions and distinct values currently in the corpus."""
+    cache_key = "dimensions"
+    if _is_cache_valid() and cache_key in _SEGMENT_CACHE:
+        return _SEGMENT_CACHE[cache_key]
+
     categories = [
         r[0] for r in db.query(RawDocument.inferred_category).distinct().filter(RawDocument.inferred_category.isnot(None)).all()
     ]
@@ -30,7 +44,7 @@ def get_segment_dimensions(
         r[0] for r in db.query(RawDocument.inferred_brand_tier).distinct().filter(RawDocument.inferred_brand_tier.isnot(None)).all()
     ]
 
-    return {
+    res = {
         "dimensions": [
             {
                 "name": "category",
@@ -49,6 +63,8 @@ def get_segment_dimensions(
             },
         ]
     }
+    _SEGMENT_CACHE[cache_key] = res
+    return res
 
 
 @router.get("/{dimension}/breakdown", summary="Get Opportunity Breakdown by Segment Dimension")
@@ -65,12 +81,17 @@ def get_segment_breakdown(
         "price_tier": "by_brand_tier",
     }
 
-    key = dim_key_map.get(dimension.lower())
+    norm_dim = dimension.lower().strip()
+    key = dim_key_map.get(norm_dim)
     if not key:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid segment dimension '{dimension}'. Choose from: category, gender, brand_tier",
         )
+
+    cache_key = f"breakdown_{norm_dim}"
+    if _is_cache_valid() and cache_key in _SEGMENT_CACHE:
+        return _SEGMENT_CACHE[cache_key]
 
     scores = (
         db.query(OpportunityScore)
@@ -92,7 +113,10 @@ def get_segment_breakdown(
             "segment_distribution": node_segments,
         })
 
-    return {
-        "dimension": dimension.lower(),
+    res = {
+        "dimension": norm_dim,
+        "total_opportunities": len(breakdown_list),
         "breakdown": breakdown_list,
     }
+    _SEGMENT_CACHE[cache_key] = res
+    return res

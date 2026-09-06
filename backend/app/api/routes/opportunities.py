@@ -1,5 +1,6 @@
 """REST API endpoints for ranked opportunities and detail views."""
 
+import time
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
@@ -14,6 +15,14 @@ from app.models.extraction import Extraction
 
 router = APIRouter(prefix="/api/v1/opportunities", tags=["Opportunity Analytics"])
 
+_OPP_CACHE: Dict[str, Any] = {}
+_OPP_CACHE_TIMESTAMP: float = 0.0
+_OPP_CACHE_TTL: float = 20.0
+
+
+def _is_opp_cache_valid() -> bool:
+    return (time.time() - _OPP_CACHE_TIMESTAMP) < _OPP_CACHE_TTL
+
 
 @router.get("", summary="Get Ranked Opportunity Areas")
 def get_opportunities(
@@ -24,6 +33,10 @@ def get_opportunities(
     _: str = Depends(verify_api_key),
 ) -> Dict[str, Any]:
     """Retrieve ranked opportunity areas sorted by composite score."""
+    cache_key = f"{min_score}_{confidence}_{limit}"
+    if _is_opp_cache_valid() and cache_key in _OPP_CACHE:
+        return _OPP_CACHE[cache_key]
+
     query = (
         db.query(OpportunityScore)
         .join(TaxonomyNode, OpportunityScore.taxonomy_node_id == TaxonomyNode.node_id)
@@ -86,13 +99,15 @@ def get_opportunities(
         if len(results) >= limit:
             break
 
-    return {
+    res = {
         "scoring_run_id": latest_score.scoring_run_id if latest_score else None,
         "computed_at": latest_score.computed_at.isoformat() if latest_score else None,
         "corpus_size": corpus_size,
         "total_opportunities": len(results),
         "opportunities": results,
     }
+    _OPP_CACHE[cache_key] = res
+    return res
 
 
 @router.get("/{id}", summary="Get Single Opportunity Detail")

@@ -288,3 +288,207 @@ export const FALLBACK_CORPUS_STATS: CorpusStats = {
   },
   "last_ingestion_at": "2026-09-04T16:37:58.482776"
 };
+
+export interface FallbackSegmentBreakdownItem {
+  node_id: string;
+  label: string;
+  composite_score: number;
+  rank: number;
+  segment_distribution: Record<string, number>;
+}
+
+export interface FallbackSegmentBreakdownResponse {
+  dimension: string;
+  total_opportunities: number;
+  breakdown: FallbackSegmentBreakdownItem[];
+}
+
+export const FALLBACK_SEGMENT_BREAKDOWNS: Record<string, FallbackSegmentBreakdownResponse> = {
+  category: {
+    dimension: 'category',
+    total_opportunities: 8,
+    breakdown: [
+      {
+        node_id: 'a242f686-6c8a-4768-97ff-8478944d82df',
+        label: 'Styling & Outfit Context Deficit',
+        rank: 1,
+        composite_score: 0.869,
+        segment_distribution: { ethnic_wear: 0.185, western: 0.533, general: 0.199, footwear: 0.083 },
+      },
+      {
+        node_id: 'e6c50547-2d40-457b-b550-350734cace4e',
+        label: 'Post-Order & Return Policy Friction',
+        rank: 2,
+        composite_score: 0.637,
+        segment_distribution: { general: 0.886, western: 0.062, accessories: 0.024, footwear: 0.024, ethnic_wear: 0.003 },
+      },
+      {
+        node_id: '4d04dd9e-05fd-453e-bf29-bccc56450743',
+        label: 'Fit & Sizing Confidence Gap',
+        rank: 3,
+        composite_score: 0.623,
+        segment_distribution: { general: 0.571, western: 0.258, footwear: 0.035, accessories: 0.01, ethnic_wear: 0.126 },
+      },
+      {
+        node_id: '17bf8b82-2420-450f-9643-efc6bc7b4b3f',
+        label: 'Wishlist Decision Deferral & Intent Latency',
+        rank: 4,
+        composite_score: 0.508,
+        segment_distribution: { general: 0.381, western: 0.19, accessories: 0.048, ethnic_wear: 0.381 },
+      },
+      {
+        node_id: '487ce4cb-9b8d-4367-9b8f-f26393f07d7c',
+        label: 'Post-Confirmation Inventory & Order Cancellations',
+        rank: 5,
+        composite_score: 0.5,
+        segment_distribution: { general: 0.779, western: 0.078, footwear: 0.026, accessories: 0.013, ethnic_wear: 0.104 },
+      },
+      {
+        node_id: '0e513d10-c96f-4eb3-b588-9f33794187b0',
+        label: 'Review Authenticity & Trust Deficit',
+        rank: 6,
+        composite_score: 0.45,
+        segment_distribution: { general: 0.922, western: 0.043, footwear: 0.007, accessories: 0.021, ethnic_wear: 0.007 },
+      },
+      {
+        node_id: '49777215-e05c-4a32-9ecf-689cf1080bdf',
+        label: 'Bookmarking vs. High-Intent Ambiguity',
+        rank: 7,
+        composite_score: 0.385,
+        segment_distribution: { general: 0.895, footwear: 0.013, western: 0.053, accessories: 0.039 },
+      },
+      {
+        node_id: '8f358299-4047-4f7c-90a6-835faa9728fc',
+        label: 'Fulfillment & Delivery Tracking Friction',
+        rank: 8,
+        composite_score: 0.362,
+        segment_distribution: { general: 0.897, western: 0.069, footwear: 0.034 },
+      },
+    ],
+  },
+  gender: {
+    dimension: 'gender',
+    total_opportunities: 8,
+    breakdown: [
+      {
+        node_id: 'a242f686-6c8a-4768-97ff-8478944d82df',
+        label: 'Styling & Outfit Context Deficit',
+        rank: 1,
+        composite_score: 0.869,
+        segment_distribution: { unknown: 0.712, women: 0.232, men: 0.056 },
+      },
+      {
+        node_id: 'e6c50547-2d40-457b-b550-350734cace4e',
+        label: 'Post-Order & Return Policy Friction',
+        rank: 2,
+        composite_score: 0.637,
+        segment_distribution: { unknown: 0.924, women: 0.016, men: 0.059 },
+      },
+      {
+        node_id: '4d04dd9e-05fd-453e-bf29-bccc56450743',
+        label: 'Fit & Sizing Confidence Gap',
+        rank: 3,
+        composite_score: 0.623,
+        segment_distribution: { unknown: 0.818, women: 0.101, men: 0.071, unisex: 0.01 },
+      },
+      {
+        node_id: '17bf8b82-2420-450f-9643-efc6bc7b4b3f',
+        label: 'Wishlist Decision Deferral & Intent Latency',
+        rank: 4,
+        composite_score: 0.508,
+        segment_distribution: { unknown: 0.952, women: 0.048 },
+      },
+      {
+        node_id: '487ce4cb-9b8d-4367-9b8f-f26393f07d7c',
+        label: 'Post-Confirmation Inventory & Order Cancellations',
+        rank: 5,
+        composite_score: 0.5,
+        segment_distribution: { unknown: 0.948, men: 0.052 },
+      },
+      {
+        node_id: '0e513d10-c96f-4eb3-b588-9f33794187b0',
+        label: 'Review Authenticity & Trust Deficit',
+        rank: 6,
+        composite_score: 0.45,
+        segment_distribution: { unknown: 0.901, men: 0.064, women: 0.021, unisex: 0.014 },
+      },
+      {
+        node_id: '49777215-e05c-4a32-9ecf-689cf1080bdf',
+        label: 'Bookmarking vs. High-Intent Ambiguity',
+        rank: 7,
+        composite_score: 0.385,
+        segment_distribution: { unknown: 0.934, men: 0.066 },
+      },
+      {
+        node_id: '8f358299-4047-4f7c-90a6-835faa9728fc',
+        label: 'Fulfillment & Delivery Tracking Friction',
+        rank: 8,
+        composite_score: 0.362,
+        segment_distribution: { unknown: 0.966, men: 0.034 },
+      },
+    ],
+  },
+  brand_tier: {
+    dimension: 'brand_tier',
+    total_opportunities: 8,
+    breakdown: [
+      {
+        node_id: 'a242f686-6c8a-4768-97ff-8478944d82df',
+        label: 'Styling & Outfit Context Deficit',
+        rank: 1,
+        composite_score: 0.869,
+        segment_distribution: { value: 0.132, mid: 0.371, premium: 0.251, unknown: 0.246 },
+      },
+      {
+        node_id: 'e6c50547-2d40-457b-b550-350734cace4e',
+        label: 'Post-Order & Return Policy Friction',
+        rank: 2,
+        composite_score: 0.637,
+        segment_distribution: { unknown: 0.808, mid: 0.192 },
+      },
+      {
+        node_id: '4d04dd9e-05fd-453e-bf29-bccc56450743',
+        label: 'Fit & Sizing Confidence Gap',
+        rank: 3,
+        composite_score: 0.623,
+        segment_distribution: { unknown: 0.566, mid: 0.293, premium: 0.086, value: 0.056 },
+      },
+      {
+        node_id: '17bf8b82-2420-450f-9643-efc6bc7b4b3f',
+        label: 'Wishlist Decision Deferral & Intent Latency',
+        rank: 4,
+        composite_score: 0.508,
+        segment_distribution: { unknown: 0.476, mid: 0.381, value: 0.143 },
+      },
+      {
+        node_id: '487ce4cb-9b8d-4367-9b8f-f26393f07d7c',
+        label: 'Post-Confirmation Inventory & Order Cancellations',
+        rank: 5,
+        composite_score: 0.5,
+        segment_distribution: { unknown: 0.623, mid: 0.351, value: 0.026 },
+      },
+      {
+        node_id: '0e513d10-c96f-4eb3-b588-9f33794187b0',
+        label: 'Review Authenticity & Trust Deficit',
+        rank: 6,
+        composite_score: 0.45,
+        segment_distribution: { unknown: 0.823, mid: 0.177 },
+      },
+      {
+        node_id: '49777215-e05c-4a32-9ecf-689cf1080bdf',
+        label: 'Bookmarking vs. High-Intent Ambiguity',
+        rank: 7,
+        composite_score: 0.385,
+        segment_distribution: { unknown: 0.934, mid: 0.066 },
+      },
+      {
+        node_id: '8f358299-4047-4f7c-90a6-835faa9728fc',
+        label: 'Fulfillment & Delivery Tracking Friction',
+        rank: 8,
+        composite_score: 0.362,
+        segment_distribution: { unknown: 0.759, mid: 0.241 },
+      },
+    ],
+  },
+};
+

@@ -1,4 +1,5 @@
 import json
+import time
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, status
 from sqlalchemy.orm import Session
@@ -13,6 +14,14 @@ from app.ingestion.pipeline import pipeline
 
 router = APIRouter(prefix="/api/v1/corpus", tags=["Corpus Management"])
 
+_CORPUS_CACHE: Dict[str, Any] = {}
+_CORPUS_CACHE_TIMESTAMP: float = 0.0
+_CORPUS_CACHE_TTL: float = 20.0
+
+
+def _is_corpus_cache_valid() -> bool:
+    return (time.time() - _CORPUS_CACHE_TIMESTAMP) < _CORPUS_CACHE_TTL
+
 
 @router.get("/stats", summary="Get Corpus Statistics")
 def get_corpus_stats(
@@ -20,6 +29,10 @@ def get_corpus_stats(
     _: str = Depends(verify_api_key)
 ) -> Dict[str, Any]:
     """Returns aggregated corpus metrics across sources, categories, and gender contexts."""
+    cache_key = "corpus_stats"
+    if _is_corpus_cache_valid() and cache_key in _CORPUS_CACHE:
+        return _CORPUS_CACHE[cache_key]
+
     total_docs = db.query(func.count(RawDocument.doc_id)).scalar() or 0
     total_extractions = db.query(func.count(Extraction.extraction_id)).scalar() or 0
 
@@ -63,7 +76,7 @@ def get_corpus_stats(
         .first()
     )
 
-    return {
+    res = {
         "total_documents": total_docs,
         "total_extractions": total_extractions,
         "platform_distribution": platform_distribution,
@@ -72,6 +85,8 @@ def get_corpus_stats(
         "brand_tier_distribution": brand_tier_distribution,
         "last_ingestion_at": last_run.completed_at.isoformat() if last_run and last_run.completed_at else None,
     }
+    _CORPUS_CACHE[cache_key] = res
+    return res
 
 
 @router.get("/documents", summary="List Ingested Documents")
