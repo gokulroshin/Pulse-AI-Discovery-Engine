@@ -243,11 +243,11 @@ class ApiClient {
 
   // Segments
   async getSegments(): Promise<{ dimensions: string[]; values: Record<string, string[]> }> {
-    const cached = this.getCached<any>('/api/v1/segments');
+    const cached = this.getCached<{ dimensions: string[]; values: Record<string, string[]> }>('/api/v1/segments');
     if (cached) return cached;
 
     try {
-      const data = await this.request('/api/v1/segments');
+      const data = await this.request<{ dimensions: string[]; values: Record<string, string[]> }>('/api/v1/segments');
       this.setCached('/api/v1/segments', data);
       return data;
     } catch {
@@ -318,7 +318,7 @@ class ApiClient {
 
   async uploadCorpus(payload: { items: any[] }): Promise<{ imported_count: number; total_submitted: number }> {
     this.cache.clear(); // invalidate cache on mutation
-    return this.request('/api/v1/corpus/upload', {
+    return this.request<{ imported_count: number; total_submitted: number }>('/api/v1/corpus/upload', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -326,7 +326,7 @@ class ApiClient {
 
   // Pipeline Engine
   async getPipelineStatus(): Promise<{ runs: PipelineRunStatus[] }> {
-    return this.request('/api/v1/pipeline/status');
+    return this.request<{ runs: PipelineRunStatus[] }>('/api/v1/pipeline/status');
   }
 
   async triggerPipeline(
@@ -334,7 +334,7 @@ class ApiClient {
     config: Record<string, any> = {}
   ): Promise<{ run_id: string; status: string; stage: string; message: string }> {
     this.cache.clear();
-    return this.request('/api/v1/pipeline/run', {
+    return this.request<{ run_id: string; status: string; stage: string; message: string }>('/api/v1/pipeline/run', {
       method: 'POST',
       body: JSON.stringify({ stage, config }),
     });
@@ -343,11 +343,11 @@ class ApiClient {
   // Taxonomy
   async getTaxonomy(): Promise<{ total_nodes: number; root_nodes: number; nodes: TaxonomyNodeItem[] }> {
     const cacheKey = '/api/v1/taxonomy';
-    const cached = this.getCached<any>(cacheKey);
+    const cached = this.getCached<{ total_nodes: number; root_nodes: number; nodes: TaxonomyNodeItem[] }>(cacheKey);
     if (cached) return cached;
 
     try {
-      const data = await this.request<any>(cacheKey);
+      const data = await this.request<{ total_nodes: number; root_nodes: number; nodes: TaxonomyNodeItem[] }>(cacheKey);
       this.setCached(cacheKey, data);
       return data;
     } catch (err) {
@@ -361,9 +361,9 @@ class ApiClient {
           description: o.description,
           parent_node_id: null,
           extraction_count: o.extraction_count,
-          representative_quotes: o.representative_quotes,
-          status: o.status,
-          children: [],
+          representative_quotes: o.representative_quotes || [],
+          status: o.status || 'auto_generated',
+          created_at: new Date().toISOString(),
         })),
       };
     }
@@ -374,7 +374,7 @@ class ApiClient {
     question: string,
     filter?: { category?: string; platform?: string }
   ): Promise<import('./types').InsightResponse> {
-    return this.request('/api/v1/insights/ask', {
+    return this.request<import('./types').InsightResponse>('/api/v1/insights/ask', {
       method: 'POST',
       body: JSON.stringify({ question, ...filter }),
     });
